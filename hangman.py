@@ -53,6 +53,7 @@ HANGMANPICS = ['''
       |
 =========''']
 words = 'ant baboon badger bat bear beaver camel cat clam cobra cougar coyote crow deer dog donkey duck eagle ferret fox frog goat goose hawk lion lizard llama mole monkey moose mouse mule newt otter owl panda parrot pigeon python rabbit ram rat raven rhino salmon seal shark sheep skunk sloth snake spider stork swan tiger toad trout turkey turtle weasel whale wolf wombat zebra'.split()
+# 맞춘 개수
 
 def getRandomWord(wordList):
     # This function returns a random string from the passed list of strings.
@@ -123,12 +124,33 @@ def main():
     gameFailed = False
     secretWord = getRandomWord(words)
 
+    correct_cnt = 0
+    int_point = 0
+
+    filename = "/Users/suyoung/PycharmProjects/test/clone_test/Hangman/point.txt"
+
+
+    try:
+        with open(filename, "r") as f:
+            str_point = f.read().strip()  # 파일을 읽어서 문자열로 저장, 양쪽 공백 제거
+            int_point = int(str_point)  # 문자열을 정수형으로 변환
+            print("게임이 시작되었습니다. 저장된 가장 높은 점수는 :", int_point, "점 입니다.")
+
+    except (FileNotFoundError, ValueError) as e:
+        print(f"Error: {e}")
+        # 예외 처리 코드 작성
+        # ...
+
+
+
+
     while True:
         displayBoard(HANGMANPICS, missedLetters, correctLetters, secretWord)
 
         if gameSucceeded or gameFailed:
             if gameSucceeded:
                 print('Yes! The secret word is "' + secretWord + '"! You have won!')
+                correct_cnt += 1
             else:
                 print('You have run out of guesses!\nAfter ' + str(len(missedLetters)) + ' missed guesses and ' + str(len(correctLetters)) + ' correct guesses, the word was "' + secretWord + '"')
 
@@ -141,6 +163,19 @@ def main():
                 secretWord = getRandomWord(words)
                 continue 
             else: 
+                '''
+                보너스 해결 부분
+                '''
+                print("이번 게임의 점수는 :", correct_cnt, "입니다.")
+
+                with open(filename, "w") as f:
+                    if int_point < correct_cnt:
+                        f.write(str(correct_cnt))
+                        print("게임이 끝났습니다. 현재 가장 높은 점수는 :", correct_cnt, "점으로 변경되었습니다.")
+                    else:
+                        f.write(str(int_point))
+                        print("게임이 끝났습니다. 현재 가장 높은 점수는 :", int_point, "점으로 기존과 같습니다.")
+            
                 break
 
         # Let the player type in a letter.
